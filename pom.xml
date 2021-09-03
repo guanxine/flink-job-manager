@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>flink-job-manager</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+
+        <flink.version>1.11.0</flink.version>
+        <scala.binary.version>2.11</scala.binary.version>
+    </properties>
+
+
+    <dependencies>
+
+        <!--flink -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-clients_2.11</artifactId>
+            <version>${flink.version}</version>
+            <!--<scope>provided</scope>-->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-yarn_2.11</artifactId>
+            <version>${flink.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+
+        <plugins>
+            <!-- Java Compiler -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
+                <configuration>
+                    <shadedArtifactAttached>false</shadedArtifactAttached>
+                    <outputFile>${project.build.directory}/shaded/All-${project.version}-shaded.jar</outputFile>
+                    <artifactSet>
+                        <excludes>
+                            <exclude>com.mi</exclude>
+                            <exclude>org.apache.spark:*</exclude>
+                        </excludes>
+                        <includes>
+                            <include>org.scala-lang:scala-library</include>
+                            <include>com.fasterxml.jackson.core:*</include>
+                            <include>com.fasterxml.jackson.module:*</include>
+                            <include>com.fasterxml.jackson.datatype:*</include>
+                            <include>com.thoughtworks.paranamer:paranamer</include>
+                            <include>com.google.guava:*</include>
+                            <include>mysql:*</include>
+                            <include>com.jcraft:*</include>
+                            <include>com.mi.cfc:*</include>
+                            <include>io.protostuff:*</include>
+                            <include>commons-cli:*</include>
+                            <include>commons-codec:commons-codec</include>
+                            <include>org.apache.commons:commons-lang3</include>
+                            <include>com.sun.mail:javax.mail</include>
+                            <include>com.google.code.gson:gson</include>
+                            <include>io.lettuce:*</include>
+                            <include>io.projectreactor:*</include>
+                            <include>org.reactivestreams:*</include>
+                            <include>org.apache.dubbo:dubbo</include>
+                            <include>org.javassist:javassist</include>
+                            <include>org.apache.curator:curator-client</include>
+                            <include>org.apache.curator:curator-framework</include>
+                            <include>org.apache.curator:curator-recipes</include>
+                            <include>org.apache.httpcomponents:httpcomponents-client</include>
+                            <include>org.apache.httpcomponents:httpclient</include>
+                            <include>org.apache.httpcomponents:httpcore</include>
+                            <include>org.apache.httpcomponents:fluent-hc</include>
+                            <include>org.apache.thrift:libthrift</include>
+                            <include>org.apache.zookeeper:zookeeper</include>
+                            <include>joda-time:joda-time</include>
+                            <include>org.apache.logging.log4j:log4j-api</include>
+                            <include>org.apache.logging.log4j:log4j-core</include>
+                            <include>org.slf4j:slf4j-api</include>
+                            <include>commons-logging:commons-logging</include>
+                            <include>com.jayway.jsonpath:json-path</include>
+                        </includes>
+
+                    </artifactSet>
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                            <resource>
+                                META-INF/services/org.apache.spark.sql.sources.DataSourceRegister
+                            </resource>
+                        </transformer>
+                    </transformers>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
